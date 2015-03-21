@@ -3,7 +3,6 @@ package com.niranjanbajgai.geoquiz;
 
 import android.app.Activity;
 import android.os.Bundle;
-
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,12 +11,12 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import java.security.InvalidParameterException;
 
 
 public class QuizActivity extends Activity {
-    //public static final String TAG= "geoquiz";
+    //private static final String TAG= "QuizActivity";
+    private static final String INDEX = "index";
 
     private Button mTrueButton;
     private Button mFalseButton;
@@ -39,12 +38,17 @@ public class QuizActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_quiz);
+
+        if (savedInstanceState != null) {
+            mCurrentIndex = savedInstanceState.getInt(INDEX, 0);
+        }
 
 //-----------Questions TextView--------------------------------------------
         mQuestionTextView= (TextView)findViewById(R.id.question_text_view);
         mQuestionTextView.setText(mQuestionBank[mCurrentIndex].getQuestion());
-         mQuestionTextView.setOnClickListener(new View.OnClickListener() {
+        mQuestionTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 updateQuestion(1);
@@ -103,6 +107,35 @@ public class QuizActivity extends Activity {
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
 
 
     @Override
@@ -127,6 +160,12 @@ public class QuizActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(INDEX, mCurrentIndex);
+    }
+
     private void makeCorrectToast(){
         Toast.makeText(QuizActivity.this,R.string.correct_toast, Toast.LENGTH_SHORT).show();
     }
@@ -140,6 +179,7 @@ public class QuizActivity extends Activity {
         switch (direction){
             case 1:
                 mCurrentIndex = (mCurrentIndex+1)% mQuestionBank.length;
+
                 mQuestionTextView.setText(mQuestionBank[mCurrentIndex].getQuestion());
                 break;
             case 0:
@@ -153,7 +193,7 @@ public class QuizActivity extends Activity {
                 mQuestionTextView.setText(mQuestionBank[mCurrentIndex].getQuestion());
                 break;
             default:
-                throw new InvalidParameterException("given paramater..."+ direction + "...Use 1 for next and 0 for previous");
+                throw new InvalidParameterException("given parameter..." + direction + "...Use 1 for next and 0 for previous");
         }
     }
 }
