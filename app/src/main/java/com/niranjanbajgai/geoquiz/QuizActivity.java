@@ -2,6 +2,7 @@ package com.niranjanbajgai.geoquiz;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,13 +16,16 @@ import java.security.InvalidParameterException;
 
 
 public class QuizActivity extends Activity {
-    //private static final String TAG= "QuizActivity";
     private static final String INDEX = "index";
+    public static final String EXTRA_ANSWER_IS_TRUE = "com.niranjanbajgai.geoquiz.answer_is_true";
+
 
     private Button mTrueButton;
     private Button mFalseButton;
     private ImageButton mNextButton;
     private ImageButton mPrevButton;
+    private Button mCheatButton;
+
 
     private TextView mQuestionTextView;
 
@@ -61,12 +65,7 @@ public class QuizActivity extends Activity {
         mTrueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mQuestionBank[mCurrentIndex].isTrueQuestion()){
-                    makeCorrectToast();
-                }
-                else {
-                    makeIncorrectToast();
-                }
+                checkAnswer(true);
 
             }
         });
@@ -76,12 +75,19 @@ public class QuizActivity extends Activity {
         mFalseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!mQuestionBank[mCurrentIndex].isTrueQuestion()){
-                    makeCorrectToast();
-                }
-                else{
-                    makeIncorrectToast();
-                }
+                checkAnswer(false);
+            }
+
+        });
+
+        mCheatButton = (Button)findViewById(R.id.cheatButton);
+        mCheatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(QuizActivity.this, CheatActivity.class);
+                i.putExtra(EXTRA_ANSWER_IS_TRUE, mQuestionBank[mCurrentIndex].isTrueQuestion());
+                startActivityForResult(i, 0);
+
             }
         });
 
@@ -108,71 +114,35 @@ public class QuizActivity extends Activity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(data == null) return;
+        mQuestionBank[mCurrentIndex].setCheater(data.getBooleanExtra(CheatActivity.EXTRA_ANSWER_SHOWN, false));
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
+    private void checkAnswer(boolean ansSelected){
+        if(mQuestionBank[mCurrentIndex].isCheater()){
+            Toast.makeText(QuizActivity.this, "Cheating is wrong", Toast.LENGTH_SHORT).show();
 
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_quiz, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
         }
+        else{
+            if(ansSelected == mQuestionBank[mCurrentIndex].isTrueQuestion()){
+                Toast.makeText(QuizActivity.this,R.string.correct_toast, Toast.LENGTH_SHORT).show();
 
-        return super.onOptionsItemSelected(item);
+            }
+            else{
+                Toast.makeText(QuizActivity.this, R.string.incorrect_toast, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(INDEX, mCurrentIndex);
-    }
-
-    private void makeCorrectToast(){
-        Toast.makeText(QuizActivity.this,R.string.correct_toast, Toast.LENGTH_SHORT).show();
-    }
-    private void makeIncorrectToast(){
-        Toast.makeText(QuizActivity.this, R.string.incorrect_toast, Toast.LENGTH_SHORT).show();
 
     }
+
+
 
     private void updateQuestion(int direction){
 

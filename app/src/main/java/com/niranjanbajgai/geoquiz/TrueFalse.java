@@ -6,10 +6,12 @@ package com.niranjanbajgai.geoquiz;
 public class TrueFalse {
     private int mQuestion;
     private boolean mTrueQuestion;
+    private boolean mCheater;
 
     public TrueFalse(int question, boolean trueQuestion){
         mQuestion = question;
         mTrueQuestion = trueQuestion;
+        mCheater = false;
     }
 
     public boolean isTrueQuestion() {
@@ -26,5 +28,12 @@ public class TrueFalse {
 
     public void setQuestion(int question) {
         this.mQuestion = question;
+    }
+
+    public void setCheater(boolean cheater){
+        this.mCheater = cheater;
+    }
+    public boolean isCheater(){
+        return mCheater;
     }
 }
